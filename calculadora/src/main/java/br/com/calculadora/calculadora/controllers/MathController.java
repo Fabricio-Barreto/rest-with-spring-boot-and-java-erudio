@@ -1,13 +1,17 @@
-package br.com.calculadora.calculadora;
+package br.com.calculadora.calculadora.controllers;
 
+import br.com.calculadora.calculadora.auxiliaries.SimpleMath;
 import br.com.calculadora.calculadora.exceptions.UnsupportedMathOperationException;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import static br.com.calculadora.calculadora.auxiliaries.Converters.*;
+
 @RestController
 public class MathController {
+    SimpleMath simpleMath = new SimpleMath();
 
     @RequestMapping(value="/sum/{numberOne}/{numberTwo}", method= RequestMethod.GET)
     public Double sum(@PathVariable("numberOne") String numberOne,
@@ -15,7 +19,7 @@ public class MathController {
         if (!isNumeric(numberOne) || !isNumeric(numberTwo)) {
             throw new UnsupportedMathOperationException("Please set a numeric value!");
         }
-        return convertToDouble(numberOne) + convertToDouble(numberTwo);
+        return simpleMath.sum(convertToDouble(numberOne),convertToDouble(numberTwo));
     }
 
     @RequestMapping(value="/sub/{numberOne}/{numberTwo}", method= RequestMethod.GET)
@@ -24,7 +28,7 @@ public class MathController {
         if (!isNumeric(numberOne) || !isNumeric(numberTwo)) {
             throw new UnsupportedMathOperationException("Please set a numeric value!");
         }
-        return convertToDouble(numberOne) - convertToDouble(numberTwo);
+        return simpleMath.sub(convertToDouble(numberOne),convertToDouble(numberTwo));
     }
 
     @RequestMapping(value="/mul/{numberOne}/{numberTwo}", method= RequestMethod.GET)
@@ -34,7 +38,7 @@ public class MathController {
             throw new UnsupportedMathOperationException("Please set a numeric value!");
         }
 
-        return convertToDouble(numberOne) * convertToDouble(numberTwo);
+        return simpleMath.mul(convertToDouble(numberOne),convertToDouble(numberTwo));
     }
 
     @RequestMapping(value="/div/{numberOne}/{numberTwo}", method= RequestMethod.GET)
@@ -48,24 +52,7 @@ public class MathController {
             throw new UnsupportedMathOperationException("Please set a number different to zero");
         }
 
-        return convertToDouble(numberOne) / convertToDouble(numberTwo);
+        return simpleMath.div(convertToDouble(numberOne),convertToDouble(numberTwo));
     }
 
-    private boolean isZero(String strNumber) {
-        if (Double.parseDouble(strNumber) == 0) return true;
-        return false;
-    }
-
-    private Double convertToDouble(String strNumber) {
-        if (strNumber == null) return 0D;
-        String number = strNumber.replaceAll(",",".");
-        if (isNumeric(number)) return Double.parseDouble(number);
-        return 0D;
-    }
-
-    private boolean isNumeric(String strNumber){
-        if (strNumber == null) return false;
-        String number = strNumber.replaceAll(",",".");
-        return number.matches("[-+]?[0-9]*\\.?[0-9]+");
-    }
 }
